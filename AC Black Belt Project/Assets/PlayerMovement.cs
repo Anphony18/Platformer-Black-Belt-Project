@@ -7,9 +7,13 @@ public class PlayerMovement : MonoBehaviour
     public float speed;
     private float Move;
 
+    private float inputHorizontal;
+
     public float jump;
 
     public bool isJumping;
+
+    private int doubleJumps = 1;
 
     private bool canDash = true;
     private bool isDashing;
@@ -33,12 +37,27 @@ public class PlayerMovement : MonoBehaviour
         }
 
         Move = Input.GetAxis("Horizontal");
+        inputHorizontal = Input.GetAxisRaw("Horizontal");
 
         rb.velocity = new Vector2(speed * Move, rb.velocity.y);
+
+        if (inputHorizontal > 0)
+        {
+            gameObject.transform.localScale = new Vector3(1, 1, 1);
+        }
+        if (inputHorizontal < 0)
+        {
+            gameObject.transform.localScale = new Vector3(-1, 1, 1);
+        }
 
         if (Input.GetButtonDown("Jump") && isJumping == false)
         {
             rb.AddForce(new Vector2(rb.velocity.x, jump));
+        }
+        if (Input.GetButtonDown("Jump") && isJumping == true && doubleJumps > 0)
+        {
+            rb.AddForce(new Vector2(rb.velocity.x, jump + 100));
+            doubleJumps -= 1;
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
@@ -52,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
         {
             isJumping = false;
+            doubleJumps = 1;
         }
     }
 
@@ -77,3 +97,4 @@ public class PlayerMovement : MonoBehaviour
         canDash = true;
     }
 }
+
